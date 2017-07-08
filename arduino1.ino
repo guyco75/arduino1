@@ -4,6 +4,9 @@
 
 #include <dht.h>
 
+#include "aIRremote.h"
+IRsend irs;
+
 //#define REPLY_DEBUG
 
 String rxCmdStr;
@@ -19,6 +22,7 @@ void setup() {
 
 void loop() {
   static boolean inSync = false;
+
   while (Serial.available()) {
     char c = Serial.read();
 
@@ -71,6 +75,7 @@ void handleCommand() {
     case 2: sendToAC(); break;
     case 3: setIRLed(); break;
     case 4: tvCommand(); break;
+    case 5: pioneerReceiver(); break;
   }
 }
 
@@ -149,9 +154,6 @@ void setIRLed() {
   //$3,1,#
 }
 
-#include "aIRremote.h"
-IRsend irs;
-
 void tvCommand() {
   unsigned long cmd;
 
@@ -176,4 +178,29 @@ void tvCommand() {
   Serial.println("${\"status\":\"OK\"}#");
 }
 
+void pioneerReceiver() {
+  unsigned long cmd, scmd;
+
+  cmd = getNextToken().toInt();
+  Serial.println(cmd);
+  if (!cmd) {
+    Serial.println("${\"status\":\"ERR Invalid/NaN cmd\"}#");
+    return;
+  }
+
+  if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
+
+  switch (cmd) {
+    case 1:  scmd = 0xA55A58A7; break; // ON
+    case 2:  scmd = 0xA55AD827; break; // OFF
+    case 3:  scmd = 0xA55A38C7; break; // Toggle ON/Off
+    default: scmd = cmd;        break; // RAW
+  }
+  for (int i=0; i<2; ++i) {
+    irs.sendNEC(scmd, 32);
+    delay(26);
+  }
+
+  Serial.println("${\"status\":\"OK\"}#");
+}
 

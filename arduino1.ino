@@ -192,7 +192,7 @@ void pioneerReceiver() {
     case 3:  scmd = 0xA55A38C7; break; // Toggle ON/Off
     default: scmd = cmd;        break; // RAW
   }
-  for (int i=0; i<2; ++i) {
+  for (int i=0; i<4; ++i) {
     irs.sendNEC(scmd, 32);
     delay(26);
   }

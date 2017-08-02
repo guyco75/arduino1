@@ -155,7 +155,6 @@ void tvCommand() {
   unsigned long cmd;
 
   cmd = getNextToken().toInt();
-  Serial.println(cmd);
   if (!cmd) {
     Serial.println("${\"status\":\"ERR Invalid/NaN cmd\"}#");
     return;
@@ -179,7 +178,6 @@ void pioneerReceiver() {
   unsigned long cmd, scmd;
 
   cmd = getNextToken().toInt();
-  Serial.println(cmd);
   if (!cmd) {
     Serial.println("${\"status\":\"ERR Invalid/NaN cmd\"}#");
     return;

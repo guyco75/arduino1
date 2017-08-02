@@ -152,7 +152,7 @@ void setIRLed() {
 }
 
 void tvCommand() {
-  unsigned long cmd;
+  unsigned long cmd, scmd;
 
   cmd = getNextToken().toInt();
   if (!cmd) {
@@ -162,13 +162,14 @@ void tvCommand() {
 
   if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
 
+  switch (cmd) {
+    case 1:  scmd = 0xE0E09966; break; // ON
+    case 2:  scmd = 0xE0E019E6; break; // OFF
+    case 3:  scmd = 0xE0E040BF; break; // Toggle ON/Off
+    default: scmd = cmd;        break; // RAW
+  }
   for (int i=0; i<3; ++i) {
-    switch (cmd) {
-      case 1:  irs.sendSAMSUNG(0xE0E09966, 32); break; // ON
-      case 2:  irs.sendSAMSUNG(0xE0E019E6, 32); break; // OFF
-      case 3:  irs.sendSAMSUNG(0xE0E040BF, 32); break; // Toggle ON/Off
-      //default: irs.sendSAMSUNG(cmd, 32);        break; // RAW
-    }
+    irs.sendSAMSUNG(scmd, 32); break;
     delay(50);
   }
   Serial.println("${\"status\":\"OK\"}#");

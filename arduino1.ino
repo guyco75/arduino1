@@ -1,10 +1,7 @@
-#include <IRelectra.h>
-#include <aIRremote.h>
-#include <aIRremoteInt.h>
 
+#include "IRelectra.h"
 #include <dht.h>
 
-#include "aIRremote.h"
 IRsend irs;
 
 //#define REPLY_DEBUG

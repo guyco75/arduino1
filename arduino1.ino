@@ -47,7 +47,7 @@ void loop() {
   }
 }
 
-int a, b;
+unsigned int a, b;
 
 static inline String getNextToken() {
   String ret;

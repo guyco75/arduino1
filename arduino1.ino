@@ -99,6 +99,7 @@ void getTemperature() {
   Serial.print(DHT.humidity, 1);
   Serial.print("\"}#");
   Serial.println();
+  delay(50);
 }
 
 IRsend irsend;
@@ -149,6 +150,7 @@ void setIRLed() {
 
   Serial.println("${\"status\":\"OK\"}#");
   //$3,1,#
+  delay(50);
 }
 
 void tvCommand() {
@@ -173,6 +175,7 @@ void tvCommand() {
     delay(50);
   }
   Serial.println("${\"status\":\"OK\"}#");
+  delay(50);
 }
 
 void pioneerReceiver() {
@@ -205,5 +208,6 @@ void pioneerReceiver() {
 
   if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
   Serial.println("${\"status\":\"OK\"}#");
+  delay(50);
 }
 

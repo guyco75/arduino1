@@ -118,7 +118,7 @@ uint64_t IRelectra::EncodeElectra(int power, int mode, int fan, int temp, int sw
     uint64_t num = 0;
 
     if (tempNotif)
-      temp -= 3;
+      temp -= 5;
     else
       temp -= 15;
 

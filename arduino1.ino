@@ -176,27 +176,34 @@ void tvCommand() {
 }
 
 void pioneerReceiver() {
-  unsigned long cmd, scmd;
+  uint32_t cmd, scmd;
+  uint8_t n;
 
-  cmd = getNextToken().toInt();
-  if (!cmd) {
-    Serial.println("${\"status\":\"ERR Invalid/NaN cmd\"}#");
+  n = getNextToken().toInt();
+  if (!n) {
+    Serial.println("${\"status\":\"ERR Invalid/NaN n\"}#");
     return;
   }
 
-  if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
+  for (int i=0; i<n; ++i) {
+    cmd = getNextToken().toInt();
+    if (!cmd) {
+      Serial.println("${\"status\":\"ERR Invalid/NaN cmd\"}#");
+      return;
+    }
 
-  switch (cmd) {
-    case 1:  scmd = 0xA55A58A7; break; // ON
-    case 2:  scmd = 0xA55AD827; break; // OFF
-    case 3:  scmd = 0xA55A38C7; break; // Toggle ON/Off
-    default: scmd = cmd;        break; // RAW
-  }
-  for (int i=0; i<4; ++i) {
+    switch (cmd) {
+      case 1:  scmd = 0xA55A58A7; break; // ON
+      case 2:  scmd = 0xA55AD827; break; // OFF
+      case 3:  scmd = 0xA55A38C7; break; // Toggle ON/Off
+      default: scmd = cmd;        break; // RAW
+    }
+
     irs.sendNEC(scmd, 32);
     delay(26);
   }
 
+  if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
   Serial.println("${\"status\":\"OK\"}#");
 }
 

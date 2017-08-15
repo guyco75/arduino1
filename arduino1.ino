@@ -7,13 +7,16 @@ IRsend irs;
 //#define REPLY_DEBUG
 
 String rxCmdStr;
-#define IR_LED_PIN (13)
+
+#define IR_EMITTER     (3)  // Place holder (hardcoded in the lib)
+#define DHT_PIN        (5)
+#define BUILT_IN_LED   (13)
 
 void setup() {
   Serial.begin(57600);
   Serial.println("$ready#");
 
-  pinMode(IR_LED_PIN, OUTPUT);
+  pinMode(BUILT_IN_LED, OUTPUT);
   rxCmdStr.reserve(128);
 }
 
@@ -76,7 +79,6 @@ void handleCommand() {
   }
 }
 
-#define DHT_PIN 5
 dht DHT;
 
 void getTemperature() {
@@ -143,9 +145,9 @@ void setIRLed() {
   if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
   
   switch(led) {
-    case 0: digitalWrite(IR_LED_PIN, LOW);   break;
-    case 1: digitalWrite(IR_LED_PIN, HIGH);  break;
-    case 2: digitalWrite(IR_LED_PIN, (s=1-s)?HIGH:LOW);
+    case 0: digitalWrite(BUILT_IN_LED, LOW);   break;
+    case 1: digitalWrite(BUILT_IN_LED, HIGH);  break;
+    case 2: digitalWrite(BUILT_IN_LED, (s=1-s)?HIGH:LOW);
   }
 
   Serial.println("${\"status\":\"OK\"}#");

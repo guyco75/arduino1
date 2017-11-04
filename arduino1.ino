@@ -76,6 +76,7 @@ void handleCommand() {
     case 3: setIRLed(); break;
     case 4: tvCommand(); break;
     case 5: pioneerReceiver(); break;
+    case 6: teacCableSAT(); break;
   }
 }
 
@@ -207,6 +208,18 @@ void pioneerReceiver() {
     irs.sendNEC(scmd, 32);
     delay(26);
   }
+
+  if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
+  Serial.println("${\"status\":\"OK\"}#");
+  delay(50);
+}
+
+void teacCableSAT() {
+  unsigned int irSignal[] = {
+8936,4500,540,584,544,584,512,596,540,584,544,584,516,592,536,588,540,584,520,1720,540,1692,540,1712,512,1720,540,1692,540,1716,512,596,536,1716,512,1720,540,584,512,596,540,1712,516,1720,544,576,520,1720,540,584,512,596,540,1712,512,1720,544,580,520,588,544,1708,520,588,540,1716,512,42036,8944,2260,516,65535,8916,2276,536
+  };
+
+  irs.sendRaw(irSignal, sizeof(irSignal) / sizeof(irSignal[0]), 40);
 
   if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
   Serial.println("${\"status\":\"OK\"}#");

@@ -10,6 +10,7 @@ String rxCmdStr;
 
 #define IR_EMITTER     (3)  // Place holder (hardcoded in the lib)
 #define DHT_PIN        (5)
+#define NIGHT_LED_PIN  (9)
 #define BUILT_IN_LED   (13)
 
 void setup() {
@@ -17,6 +18,7 @@ void setup() {
   Serial.println("$ready#");
 
   pinMode(BUILT_IN_LED, OUTPUT);
+  pinMode(NIGHT_LED_PIN, OUTPUT);
   rxCmdStr.reserve(128);
 }
 
@@ -77,6 +79,7 @@ void handleCommand() {
     case 4: tvCommand(); break;
     case 5: pioneerReceiver(); break;
     case 6: teacCableSAT(); break;
+    case 7: nightLEDs(); break;
   }
 }
 
@@ -222,6 +225,19 @@ void teacCableSAT() {
   irs.sendRaw(irSignal, sizeof(irSignal) / sizeof(irSignal[0]), 40);
 
   if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
+  Serial.println("${\"status\":\"OK\"}#");
+  delay(50);
+}
+
+void nightLEDs() {
+  int intensity;
+
+  intensity = getNextToken().toInt();
+  if (intensity < 0 || 255 < intensity) {Serial.println("${\"status\":\"ERR intensity\"}#");return;}
+
+  if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
+
+  analogWrite(NIGHT_LED_PIN, intensity);
   Serial.println("${\"status\":\"OK\"}#");
   delay(50);
 }

@@ -12,6 +12,7 @@ String rxCmdStr;
 #define DHT_PIN        (5)
 #define NIGHT_LED_PIN  (9)
 #define BUILT_IN_LED   (13)
+#define AC_STATE_PIN   (A5)
 
 DHT dht(DHT_PIN, DHT22);
 
@@ -21,6 +22,7 @@ void setup() {
 
   pinMode(BUILT_IN_LED, OUTPUT);
   pinMode(NIGHT_LED_PIN, OUTPUT);
+  pinMode(AC_STATE_PIN, INPUT_PULLUP);
   rxCmdStr.reserve(128);
 
   dht.begin();
@@ -28,6 +30,8 @@ void setup() {
 
 void loop() {
   static boolean inSync = false;
+  static int ac_state = -1;
+  static unsigned long ac_state_change_count = 0;
 
   while (Serial.available()) {
     char c = Serial.read();
@@ -37,7 +41,7 @@ void loop() {
       inSync = true;
       continue;
     }
-    
+
     if (inSync) {
       if (c == '#') {
         handleCommand();
@@ -50,6 +54,22 @@ void loop() {
         }
       }
     }
+  }
+
+  int t = !digitalRead(AC_STATE_PIN);
+  if (t != ac_state) {
+    ac_state_change_count ++;
+    if (ac_state_change_count > 10) {
+      ac_state = t;
+      Serial.print("${\"ac_state\":\"");
+      Serial.print(ac_state);
+      Serial.print("\"}#");
+      Serial.println();
+      ac_state_change_count = 0;
+    }
+    delay(5);
+  } else {
+    ac_state_change_count = 0;
   }
 }
 

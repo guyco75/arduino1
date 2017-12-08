@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-#include <aIRremote.h>
+#include "aIRremote.h"
 
 #define POWER_OFF 0
 #define POWER_ON  1

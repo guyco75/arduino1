@@ -1,6 +1,6 @@
 
 #include "IRelectra.h"
-#include <dht.h>
+#include <DHT.h>
 
 IRsend irs;
 
@@ -13,6 +13,8 @@ String rxCmdStr;
 #define NIGHT_LED_PIN  (9)
 #define BUILT_IN_LED   (13)
 
+DHT dht(DHT_PIN, DHT22);
+
 void setup() {
   Serial.begin(57600);
   Serial.println("$ready#");
@@ -20,6 +22,8 @@ void setup() {
   pinMode(BUILT_IN_LED, OUTPUT);
   pinMode(NIGHT_LED_PIN, OUTPUT);
   rxCmdStr.reserve(128);
+
+  dht.begin();
 }
 
 void loop() {
@@ -83,26 +87,21 @@ void handleCommand() {
   }
 }
 
-dht DHT;
-
 void getTemperature() {
   int chk;
   if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
 
-#ifdef REPLY_DEBUG
-  chk = 0;
-  DHT.temperature = random(10, 37);
-  DHT.humidity = random(40, 60);
-#else
-  chk = DHT.read22(DHT_PIN);
-#endif
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+
+  chk = !isnan(t) && !isnan(h);
 
   Serial.print("${\"status\":\"");
   Serial.print(chk);
   Serial.print("\",\"temperature\":\"");
-  Serial.print(DHT.temperature, 1);
+  Serial.print(t, 1);
   Serial.print("\",\"humidity\":\"");
-  Serial.print(DHT.humidity, 1);
+  Serial.print(h, 1);
   Serial.print("\"}#");
   Serial.println();
   delay(50);

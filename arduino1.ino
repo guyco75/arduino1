@@ -67,7 +67,7 @@ void loop() {
       Serial.println();
       ac_state_change_count = 0;
     }
-    delay(5);
+    delay(1);
   } else {
     ac_state_change_count = 0;
   }
@@ -124,7 +124,7 @@ void getTemperature() {
   Serial.print(h, 1);
   Serial.print("\"}#");
   Serial.println();
-  delay(50);
+  delay(1);
 }
 
 IRsend irsend;
@@ -175,7 +175,7 @@ void setIRLed() {
 
   Serial.println("${\"status\":\"OK\"}#");
   //$3,1,#
-  delay(50);
+  delay(1);
 }
 
 void tvCommand() {
@@ -193,18 +193,19 @@ void tvCommand() {
     case 1:  scmd = 0xE0E09966; break; // ON
     case 2:  scmd = 0xE0E019E6; break; // OFF
     case 3:  scmd = 0xE0E040BF; break; // Toggle ON/Off
+    case 4:  scmd = 0xE0E0D12E; break; // HDMI
     default: scmd = cmd;        break; // RAW
   }
   for (int i=0; i<3; ++i) {
-    irs.sendSAMSUNG(scmd, 32); break;
-    delay(50);
+    irs.sendSAMSUNG(scmd, 32);
+    delay(46);
   }
   Serial.println("${\"status\":\"OK\"}#");
-  delay(50);
+  delay(1);
 }
 
 void pioneerReceiver() {
-  uint32_t cmd, scmd;
+  uint32_t cmd, scmd1, scmd2;
   uint8_t n;
 
   n = getNextToken().toInt();
@@ -220,20 +221,28 @@ void pioneerReceiver() {
       return;
     }
 
+    scmd2 = 0;
     switch (cmd) {
-      case 1:  scmd = 0xA55A58A7; break; // ON
-      case 2:  scmd = 0xA55AD827; break; // OFF
-      case 3:  scmd = 0xA55A38C7; break; // Toggle ON/Off
-      default: scmd = cmd;        break; // RAW
+      case 1:  scmd1 = 0xA55A58A7; break; // ON
+      case 2:  scmd1 = 0xA55AD827; break; // OFF
+      case 3:  scmd1 = 0xA55A38C7; break; // Toggle ON/Off
+      case 4:  scmd1 = 0xA55A3AC5;
+               scmd2 = 0xA55A03FC; break; // BD
+      case 5:  scmd1 = 0xA55A08F7; break; // Cable/SAT
+      default: scmd1 = cmd;        break; // RAW
     }
 
-    irs.sendNEC(scmd, 32);
+    irs.sendNEC(scmd1, 32);
     delay(26);
+    if (scmd2) {
+      irs.sendNEC(scmd2, 32);
+      delay(26);
+    }
   }
 
   if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
   Serial.println("${\"status\":\"OK\"}#");
-  delay(50);
+  delay(1);
 }
 
 void teacCableSAT() {
@@ -245,7 +254,7 @@ void teacCableSAT() {
 
   if (!verifyEnding()) {Serial.println("${\"status\":\"ERR ending\"}#");return;}
   Serial.println("${\"status\":\"OK\"}#");
-  delay(50);
+  delay(26);
 }
 
 void nightLEDs() {
@@ -258,6 +267,6 @@ void nightLEDs() {
 
   analogWrite(NIGHT_LED_PIN, intensity);
   Serial.println("${\"status\":\"OK\"}#");
-  delay(50);
+  delay(1);
 }
 
